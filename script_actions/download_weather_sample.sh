@@ -29,6 +29,9 @@ EOF
 ##unzip files
 gunzip ~/weather_temp/*.csv.gz
 
+##download additional files from github
+wget https://raw.githubusercontent.com/joshuafennessy/hdinsightdemo/master/data/calendar.csv -O ~/weather_temp/calendar.csv
+
 ##upload to HDFS
 hadoop fs -rm -r /data/weather/
 hadoop fs -mkdir -p /data/weather/daily
@@ -41,6 +44,9 @@ hadoop fs -put ~/weather_temp/ghcnd-stations.txt /data/weather/stations
 
 hadoop fs -mkdir -p /data/weather/states
 hadoop fs -put ~/weather_temp/ghcnd-states.txt /data/weather/states
+
+hadoop fs -mkdir -p /data/utils/calendar
+hadoop fs -put ~/weather_temp/calendar.csv /data/utils/calendar
 
 ##clean up file system
 rm -rf ~/weather_temp
