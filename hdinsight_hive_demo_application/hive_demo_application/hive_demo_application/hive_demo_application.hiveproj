@@ -22,6 +22,7 @@
   <ItemGroup>
     <Script Include="01 - Introduction.hql" />
     <Script Include="02 - Daily table.hql" />
+    <Script Include="02a - Daily table query.hql" />
     <Script Include="03 - Stations table.hql" />
   </ItemGroup>
   <Import Project="$(AppData)\Microsoft\HDInsight Tools for Visual Studio\MsBuild\1.0\Hive.targets" />
