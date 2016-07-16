@@ -2,10 +2,10 @@
 
 USE weather;
 
-CREATE TABLE calendar
+CREATE EXTERNAL TABLE calendar
 (
-    ID INT,
-	DateID INT,
+    id INT,
+	date_id INT,
 	actual_date	DATE,
     local_data_string STRING,
 	year INT,
