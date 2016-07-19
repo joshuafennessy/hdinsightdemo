@@ -47,7 +47,8 @@
         "type": "Microsoft.HDInsight/clusters",
         "location": "eastus",
         "dependsOn": [
-          "[variables('clusterStorageAccountDeployment')]"
+          "[variables('clusterStorageAccountDeployment')]",
+          "concat('Microsoft.Storage/servers/databases/', variables('hiveMetastoreDatabaseName'))"
         ],
         "properties": {
           "clusterVersion": "3.4",
