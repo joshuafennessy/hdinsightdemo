@@ -36,8 +36,8 @@
   "variables": {
     "clusterStorageAccountDeployment": "[concat('Microsoft.Storage/storageAccounts/', parameters('clusterName'))]",
     "clusterDefaultFS": "[concat('wasb://hdi@',parameters('clusterName'),'.blob.core.windows.net')]",
-    "sqlServerName": "concat(parameters('clusterName'), 'sqlsrv'",
-    "hiveMetastoreDatabaseName": "[concat(parameters('clusterName'), '_hive')]",
+    "sqlServerName": "[parameters('clusterName')]",
+    "hiveMetastoreDatabaseName": "hivemetastore",
     "hiveMetastoreConnectionString": "[concat('jdbc:sqlserver://',parameters('clusterName'),'.database.windows.net;database=',variables('hiveMetastoreDatabaseName'),';encrypt=true;trustServerCertificate=true;create=flase;loginTimeout=300;')]"
   },
   "resources": [
@@ -48,7 +48,7 @@
         "location": "eastus",
         "dependsOn": [
           "[variables('clusterStorageAccountDeployment')]",
-          "[concat('Microsoft.Sql/servers/databases/', variables('hiveMetastoreDatabaseName'))]"
+          "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
         ],
         "properties": {
           "clusterVersion": "3.4",
@@ -65,20 +65,6 @@
               "core-site": {
                 "fs.defaultFS": "[variables('clusterDefaultFS')]",
                 "fs.azure.account.key.jfennessytraining.blob.core.windows.net": "[listKeys(variables('clusterStorageAccountDeployment'), '2015-05-01-preview').key1]"
-              },
-              "hive-site":{
-                "javax.jdo.option.ConnectionDriverName": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-                "javax.jdo.option.ConnectionURL": "variables('hiveMetastoreConnectionString')",
-                "javax.jdo.option.ConnectionUserName": "parameters('clusterUserName')",
-                "javax.jdo.option.ConnectionPassword": "parameters('clusterPassword')"     
-              },
-              "hive-env":{
-                "hive_database": "Existing MSSQL Server database with SQL authentication",
-                "hive_database_name": "variables('hiveMetastoreDatabaseName')",
-                "hive_database_type": "mssql",
-                "hive_existing_mssql_server_database": "variables('hiveMetastoreDatabaseName')",
-                "hive_existing_mssql_server_host": "concat(variables('sqlServerName'),'.database.windows.net)",
-                "hive_hostname": "concat(variables('sqlServerName'),'.database.windows.net)"
               }
             }
           },
@@ -135,62 +121,49 @@
                 "accountType": "Standard_LRS"
             }
         },
+    {
+      "type": "Microsoft.Sql/servers",
+      "name": "jfennessytraining",
+      "apiVersion": "2014-04-01-preview",
+      "location": "East US",
+      "properties": {
+        "administratorLogin": "[parameters('clusterUserName')]",
+        "administratorLoginPassword": "[parameters('clusterPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
         {
-          "type": "Microsoft.Sql/servers",
-          "name": "variables('sqlServerName')",
-          "apiVersion": "2014-04-01-preview",
-          "location": "East US",
-          "properties": {
-                "administratorLogin": "parameters('clusterUserName')",
-                "administratorLoginPassword": "parameters('clusterPassword')",
-                "version": "12.0"
-            }
-        },
-        {
-          "type": "Microsoft.Sql/servers/databases",
-          "kind": "v12.0,user",
-          "name": "variables('hiveMetastoreDatabaseName')",
-          "apiVersion": "2014-04-01-preview",
-          "location": "East US",
-          "properties": {
-            "edition": "Basic",
-            "status": "Online",
-            "serviceLevelObjective": "Basic",
-            "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "2147483648",
-            "defaultSecondaryLocation": "East US 2",
-            "elasticPoolName": null
+          "name": "weather",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "displayName": "Weather Database"
           },
+          "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "concat('Microsoft.Sql/servers/',variables('sqlServerName'))"
-          ]
-
-        },
-        {
-          "type": "Microsoft.Resources/deployments",
-          "apiVersion": "2015-01-01",
-          "name": "concat('RServerForHDInsight_',parameters('clusterName'))",
-          "dependsOn": [
-            "concat('Microsoft.HDInsight/clusters/',parameters('clusterName')"
+            "[variables('sqlserverName')]"
           ],
           "properties": {
-            "mode": "Incremental",
-            "templateLink": {
-              "uri": "https://gallery.azure.com/artifact/20150101/Microsoft.RServerForHDInsight.8.0.3/Artifacts/mainTemplate.json",
-              "contentVersion": "1.0.0.0"
-            },
-            "parameters": {
-              "clusterName": {
-                "value": "[parameters('clusterName')]"
-              },
-              "galleryPackageIdentity": {
-                "value": "Microsoft.RServerForHDInsight.8.0.3"
-              },
-              "edgeNodeSize": {
-                "value": "Standard_D4_v2"
-              }
-            }
+            "edition": "Basic",
+            "collation": "SQL_Latin1_General_Cp1_CI_AI_KI_WI",
+            "maxSizeBytes": "2147483648",
+            "requestedServiceObjectiveName": "S0"
+          }
+        },
+        {
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
           }
         }
+      ]
+    }
     ]
 }
