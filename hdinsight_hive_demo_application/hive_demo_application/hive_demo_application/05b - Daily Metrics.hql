@@ -14,10 +14,18 @@ SELECT
 	c.year,
 	c.month,
 	c.month_name_short,
-	c.month_name_short + ’ ‘ + CAST(c.year as STRING) as month_year
+	concat(c.month_name_short, ' ', CAST(c.year as STRING)) as month_year,
+    s.station_latitude,
+    s.station_longitude,
+    s.station_state,
+    s.station_name
 FROM
 	weather_daily_main_metrics d
 JOIN
 	calendar c
 ON
 	d.year_month_date = c.date_id
+JOIN    
+    stations s
+ON  
+    d.station_id = s.station_id; 

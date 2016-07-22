@@ -1,0 +1,1 @@
+﻿SELECT DISTINCT SUBSTR(station_name,1, 3) as country_i_think FROM weather.daily_metrics;
