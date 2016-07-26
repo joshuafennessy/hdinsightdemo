@@ -130,40 +130,7 @@
         "administratorLogin": "[parameters('clusterUserName')]",
         "administratorLoginPassword": "[parameters('clusterPassword')]",
         "version": "12.0"
-      },
-      "resources": [
-        {
-          "name": "weather",
-          "type": "databases",
-          "location": "[resourceGroup().location]",
-          "tags": {
-            "displayName": "Weather Database"
-          },
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
-          "properties": {
-            "edition": "Basic",
-            "collation": "SQL_Latin1_General_Cp1_CI_AI_KI_WI",
-            "maxSizeBytes": "2147483648",
-            "requestedServiceObjectiveName": "S0"
-          }
-        },
-        {
-          "type": "firewallrules",
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
-          "location": "[resourceGroup().location]",
-          "name": "AllowAllWindowsAzureIps",
-          "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
-          }
-        }
-      ]
+      }
     }
     ]
 }
