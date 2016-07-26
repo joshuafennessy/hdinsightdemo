@@ -35,10 +35,7 @@
   },
   "variables": {
     "clusterStorageAccountDeployment": "[concat('Microsoft.Storage/storageAccounts/', parameters('clusterName'))]",
-    "clusterDefaultFS": "[concat('wasb://hdi@',parameters('clusterName'),'.blob.core.windows.net')]",
-    "sqlServerName": "[parameters('clusterName')]",
-    "hiveMetastoreDatabaseName": "hivemetastore",
-    "hiveMetastoreConnectionString": "[concat('jdbc:sqlserver://',parameters('clusterName'),'.database.windows.net;database=',variables('hiveMetastoreDatabaseName'),';encrypt=true;trustServerCertificate=true;create=flase;loginTimeout=300;')]"
+    "clusterDefaultFS": "[concat('wasb://hdi@',parameters('clusterName'),'.blob.core.windows.net')]"
   },
   "resources": [
       {
@@ -47,8 +44,7 @@
         "type": "Microsoft.HDInsight/clusters",
         "location": "eastus",
         "dependsOn": [
-          "[variables('clusterStorageAccountDeployment')]",
-          "[concat('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+          "[variables('clusterStorageAccountDeployment')]"
         ],
         "properties": {
           "clusterVersion": "3.4",
@@ -120,50 +116,6 @@
             "properties": {
                 "accountType": "Standard_LRS"
             }
-        },
-    {
-      "type": "Microsoft.Sql/servers",
-      "name": "jfennessytraining",
-      "apiVersion": "2014-04-01-preview",
-      "location": "East US",
-      "properties": {
-        "administratorLogin": "[parameters('clusterUserName')]",
-        "administratorLoginPassword": "[parameters('clusterPassword')]",
-        "version": "12.0"
-      },
-      "resources": [
-        {
-          "name": "weather",
-          "type": "databases",
-          "location": "[resourceGroup().location]",
-          "tags": {
-            "displayName": "Weather Database"
-          },
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
-          "properties": {
-            "edition": "Basic",
-            "collation": "SQL_Latin1_General_Cp1_CI_AI_KI_WI",
-            "maxSizeBytes": "2147483648",
-            "requestedServiceObjectiveName": "S0"
-          }
-        },
-        {
-          "type": "firewallrules",
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[variables('sqlserverName')]"
-          ],
-          "location": "[resourceGroup().location]",
-          "name": "AllowAllWindowsAzureIps",
-          "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
-          }
         }
-      ]
-    }
     ]
 }
