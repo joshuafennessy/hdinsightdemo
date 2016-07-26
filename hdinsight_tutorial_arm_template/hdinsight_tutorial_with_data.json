@@ -35,7 +35,8 @@
   },
   "variables": {
     "clusterStorageAccountDeployment": "[concat('Microsoft.Storage/storageAccounts/', parameters('clusterName'))]",
-    "clusterDefaultFS": "[concat('wasb://hdi@',parameters('clusterName'),'.blob.core.windows.net')]"
+    "clusterDefaultFS": "[concat('wasb://hdi@',parameters('clusterName'),'.blob.core.windows.net')]",
+    "clusterAccountKeyPropertyName": "[concat('fs.azure.account.key.', parameters('clusterName'), '.blob.core.windows.net')]"
   },
   "resources": [
       {
@@ -60,7 +61,7 @@
               },
               "core-site": {
                 "fs.defaultFS": "[variables('clusterDefaultFS')]",
-                "fs.azure.account.key.jfennessytraining.blob.core.windows.net": "[listKeys(variables('clusterStorageAccountDeployment'), '2015-05-01-preview').key1]"
+                "[variables('clusterAccountKeyPropertyName')]": "[listKeys(variables('clusterStorageAccountDeployment'), '2015-05-01-preview').key1]"
               }
             }
           },
